@@ -35,6 +35,7 @@
                 pkgs.wabt
                 pkgs.wasmtime
                 pkgs.wasmedge
+                pkgs.wizer
                 cabal
                 (pkgs.callPackage ./pkgs/wasm32-wasi-cabal.nix {
                   inherit flavour;
