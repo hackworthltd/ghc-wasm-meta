@@ -1,5 +1,5 @@
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
 
   outputs = { self, nixpkgs, flake-utils, }:
@@ -27,20 +27,21 @@
                 pkgs.haskellPackages.happy
                 (pkgs.callPackage ./pkgs/wasm32-wasi-ghc.nix { inherit flavour; })
                 wasi-sdk
-                deno
+                pkgs.deno
                 pkgs.cacert
-                nodejs
-                bun
-                binaryen
-                wabt
-                wasmtime
-                wasmedge
+                pkgs.nodejs
+                pkgs.bun
+                pkgs.binaryen
+                pkgs.wabt
+                pkgs.wasmtime
+                pkgs.wasmedge
                 cabal
                 (pkgs.callPackage ./pkgs/wasm32-wasi-cabal.nix {
                   inherit flavour;
                 })
-                proot
-                wasm-run
+                pkgs.wazero
+                #proot
+                #wasm-run
               ];
             };
           wasm32-wasi-ghc-gmp =
@@ -87,8 +88,7 @@
               wasm32-wasi-ghc-9_10 wasm32-wasi-cabal-gmp
               wasm32-wasi-cabal-native wasm32-wasi-cabal-unreg
               wasm32-wasi-cabal-9_6 wasm32-wasi-cabal-9_8 wasm32-wasi-cabal-9_10
-              wasi-sdk deno nodejs bun binaryen wabt wasmtime wasmedge wazero
-              cabal proot wasm-run;
+              wasi-sdk cabal;
             default = all "gmp";
             all_gmp = all "gmp";
             all_native = all "native";
@@ -96,6 +96,12 @@
             all_9_6 = all "9.6";
             all_9_8 = all "9.8";
             all_9_10 = all "9.10";
+          };
+
+          devShells.default = pkgs.mkShell {
+            buildInputs = [
+              self.packages.${system}.all_gmp
+            ];
           };
         });
 }

@@ -1,7 +1,9 @@
-{ callPackage, fetchurl, flavour, runtimeShellPackage, stdenvNoCC, }:
+{ callPackage, fetchurl, flavour, hostPlatform, runtimeShellPackage, stdenvNoCC, zstd }:
 let
   common-src = builtins.fromJSON (builtins.readFile ../autogen.json);
-  src = fetchurl common-src."wasm32-wasi-ghc-${flavour}";
+  arch =
+    if hostPlatform.system == "x86_64-linux" then "" else "-${hostPlatform.system}";
+  src = fetchurl common-src."wasm32-wasi-ghc-${flavour}${arch}";
   wasi-sdk = callPackage ./wasi-sdk.nix { };
 in
 stdenvNoCC.mkDerivation {
@@ -9,7 +11,7 @@ stdenvNoCC.mkDerivation {
 
   inherit src;
 
-  nativeBuildInputs = [ wasi-sdk ];
+  nativeBuildInputs = [ wasi-sdk zstd ];
   buildInputs = [ runtimeShellPackage ];
 
   preConfigure = ''
